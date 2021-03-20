@@ -1,0 +1,74 @@
+﻿@page "/multiplication"
+
+<h3>Multiplication</h3>
+
+<h4>@_firstNumber X @_secondNumber = </h4>
+<input @bind="_answer" @onkeyup="OnKeyup" />
+<button @onclick="Verify">Vérifier</button>
+
+<h1>@_verificationMessage</h1>
+<h1>@_lastAnswer</h1>
+
+@code {
+    private string _answer = string.Empty;
+    private string _lastAnswer = string.Empty;
+    private int _firstNumber;
+    private int _secondNumber;
+    private bool _success;
+    private string _verificationMessage = string.Empty;
+
+    private void SetNumbers()
+    {
+        _firstNumber = GetNumber();
+        _secondNumber = GetNumber();
+    }
+
+    private int GetNumber()
+    {
+        var random = new Random();
+        return random.Next(0, 12);
+    }
+
+    private void Verify()
+    {
+        _success = false;
+        _verificationMessage = string.Empty;
+        var tmpSuccess = int.TryParse(_answer.Trim(), out var answerInInt);
+
+        if (tmpSuccess)
+        {
+            _success = _firstNumber * _secondNumber == answerInInt;
+            if (_success)
+            {
+                _verificationMessage = "Bonne réponse!";
+                _lastAnswer = $"{_firstNumber} X {_secondNumber} = {answerInInt}";
+
+
+                SetNumbers();
+                _answer = string.Empty;
+            }
+            else
+            {
+                _verificationMessage = "Mauvaise réponse.";
+                _lastAnswer = string.Empty;
+            }
+        }
+        else
+        {
+            _verificationMessage = "Entre un chiffre.";
+            _lastAnswer = string.Empty;
+        }
+    }
+
+    private void OnKeyup(KeyboardEventArgs e)
+    {
+        if (e.Code == "Enter" || e.Code == "NumpadEnter")
+        {
+            Verify();
+        }
+    }
+    protected override void OnInitialized()
+    {
+        SetNumbers();
+    }
+}
