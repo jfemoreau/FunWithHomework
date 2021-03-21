@@ -1,4 +1,5 @@
 using FunWithHomework.Data;
+using FunWithHomework.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Hosting;
@@ -29,6 +30,9 @@ namespace FunWithHomework
             services.AddRazorPages();
             services.AddServerSideBlazor();
             services.AddSingleton<WeatherForecastService>();
+
+            services.AddSingleton<Addition>();
+            services.AddSingleton<Multiplication>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

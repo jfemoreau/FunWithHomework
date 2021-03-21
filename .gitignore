@@ -3,3 +3,7 @@
 ################################################################################
 
 /FunWithHomework/bin
+/FunWithHomework/release
+FunWithHomework/obj
+/bin/Debug
+/obj

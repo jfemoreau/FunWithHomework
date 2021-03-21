@@ -1,0 +1,28 @@
+﻿@using FunWithHomework.Models
+<h3>@Operation.Title</h3>
+
+<h4>@Operation.FirstNumber @Operation.Symbol @Operation.SecondNumber = </h4>
+<input @bind="Operation.Answer" @onkeyup="OnKeyup" />
+<button @onclick="@Operation.Verify">Vérifier</button>
+
+<h1>@Operation.VerificationMessage</h1>
+<h1>@Operation.LastAnswer</h1>
+
+@code {
+    [Parameter]
+    public MathOperation Operation { get; set; }
+
+    private void OnKeyup(KeyboardEventArgs e)
+    {
+        if (e.Code == "Enter" || e.Code == "NumpadEnter")
+        {
+            Operation.Verify();
+        }
+    }
+    protected override void OnInitialized()
+    {
+        Operation.SetNumbers();
+    }
+}
+
+

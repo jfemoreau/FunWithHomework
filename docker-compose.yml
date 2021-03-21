@@ -1,0 +1,8 @@
+version: '3.4'
+
+services:
+  funwithhomework:
+    image: ${DOCKER_REGISTRY-}funwithhomework
+    build:
+      context: .
+      dockerfile: FunWithHomework/Dockerfile
