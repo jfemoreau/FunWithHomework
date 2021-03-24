@@ -1,8 +1,0 @@
-{
-    "root":  "bin\\Release\\netcoreapp3.1\\publish\\wwwroot",
-    "clean_urls":  true,
-    "error_page":  "index.html",
-    "routes":  {
-                   "/**":  "index.html"
-               }
-}

@@ -24,6 +24,7 @@ namespace FunWithHomework
             services.AddServerSideBlazor();
 
             services.AddTransient<Addition>();
+            services.AddTransient<Subtraction>();
             services.AddTransient<Multiplication>();
         }
 
