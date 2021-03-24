@@ -35,7 +35,7 @@ namespace FunWithHomework.Controllers
                 }
 
                 var random = new Random();
-                var currentNumberTupleIndex = random.Next(0, NumberTuples.Count);
+                var currentNumberTupleIndex = random.Next(0, NumberTuples.Count - 1);
 
                 _currentNumberTuple = NumberTuples.ElementAt(currentNumberTupleIndex);
 
