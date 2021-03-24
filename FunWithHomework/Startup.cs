@@ -26,6 +26,7 @@ namespace FunWithHomework
             services.AddTransient<Addition>();
             services.AddTransient<Subtraction>();
             services.AddTransient<Multiplication>();
+            services.AddTransient<Division>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
