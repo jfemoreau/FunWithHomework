@@ -31,8 +31,8 @@ namespace FunWithHomework
             services.AddServerSideBlazor();
             services.AddSingleton<WeatherForecastService>();
 
-            services.AddSingleton<Addition>();
-            services.AddSingleton<Multiplication>();
+            services.AddTransient<Addition>();
+            services.AddTransient<Multiplication>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
