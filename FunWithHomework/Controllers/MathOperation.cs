@@ -1,16 +1,16 @@
-﻿using System;
+﻿using FunWithHomework.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace FunWithHomework.Models
+namespace FunWithHomework.Controllers
 {
     public abstract class MathOperation
     {
-        public string Title { get; protected set; }
-        public string Symbol { get; protected set; }
-        protected Tuple<int, int> FirstNumberRange { get; set; }
-        protected Tuple<int, int> SecondNumberRange { get; set; }
+        protected MathOperationModel MathOperationModel;
+        public string Title { get => MathOperationModel?.Title; }
+        public string Symbol { get => MathOperationModel?.Symbol; }
         public string VerificationMessage { get; protected set; } = string.Empty;
         public string Answer { get; set; } = string.Empty;
         public string LastAnswer { get; protected set; } = string.Empty;
@@ -20,8 +20,11 @@ namespace FunWithHomework.Models
 
         public void SetNumbers()
         {
-            FirstNumber = GetNumber(FirstNumberRange);
-            SecondNumber = GetNumber(SecondNumberRange);
+            if (MathOperationModel != null)
+            {
+                FirstNumber = GetNumber(MathOperationModel.FirstNumberRange);
+                SecondNumber = GetNumber(MathOperationModel.SecondNumberRange);
+            }
         }
 
         public int GetNumber(Tuple<int, int> range)
@@ -32,7 +35,12 @@ namespace FunWithHomework.Models
 
         public void Verify()
         {
-            Success = false;
+            if (MathOperationModel == null)
+            {
+                throw new InvalidOperationException("Math operation model is not set.");
+            }
+
+                Success = false;
             VerificationMessage = string.Empty;
             var tmpSuccess = int.TryParse(Answer.Trim(), out var answerInInt);
 
@@ -42,7 +50,7 @@ namespace FunWithHomework.Models
                 if (Success)
                 {
                     VerificationMessage = "Bonne réponse!";
-                    LastAnswer = $"{FirstNumber} {Symbol} {SecondNumber} = {answerInInt}";
+                    LastAnswer = $"{FirstNumber} {MathOperationModel.Symbol} {SecondNumber} = {answerInInt}";
 
 
                     SetNumbers();
@@ -61,6 +69,14 @@ namespace FunWithHomework.Models
             }
         }
 
+        public void SetMathOperationModel(MathOperationModel mathOperationModel)
+        {
+            if(mathOperationModel == null)
+            {
+                throw new ArgumentNullException(nameof(mathOperationModel));
+            }
+            MathOperationModel = mathOperationModel;
+        }
         protected abstract int Operation(int firstNumber, int secondNumber);
     }
 }
