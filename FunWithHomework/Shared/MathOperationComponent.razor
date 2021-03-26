@@ -1,28 +1,60 @@
 ﻿@using FunWithHomework.Controllers
-<h3>@Operation.Title</h3>
+@using FunWithHomework.Models
+
+<h3 style="display:inline-block;">@Operation.Title</h3><EditMathOperationSettingsComponent MathOperationModel="@Operation.GetMathOperationModel()" DefaultMathOperationModel="@Operation.GetDefaultModel()" OnSave="@Save" />
 
 <h4>@Operation.FirstNumber @Operation.Symbol @Operation.SecondNumber = </h4>
 <input @bind="Operation.Answer" @onkeyup="OnKeyup" />
-<button @onclick="@Operation.Verify">Vérifier</button>
+<button class="btn" @onclick="@Operation.Verify"><i class="oi oi-check"></i></button>
 
 <h1>@Operation.VerificationMessage</h1>
 <h1>@Operation.LastAnswer</h1>
+
 
 @code {
     [Parameter]
     public MathOperation Operation { get; set; }
 
-    private void OnKeyup(KeyboardEventArgs e)
+    private async void OnKeyup(KeyboardEventArgs e)
     {
         if (e.Code == "Enter" || e.Code == "NumpadEnter")
         {
-            Operation.Verify();
+            await Operation.Verify();
         }
     }
-    protected override void OnInitialized()
+
+    private async void Save(MathOperationModel operationModel)
     {
-        Operation.SetNextNumbers();
+        Operation.ResetNumbers();
+        Operation.SetMathOperationModel(operationModel);
+
+        await Update();
     }
+
+    protected override async void OnAfterRender(bool firstRender)
+    {
+        if(firstRender)
+            await Update();
+
+        base.OnAfterRender(firstRender);
+    }
+
+
+
+    private async Task Update()
+    {
+        try
+        {
+            await Operation.SetNextNumbersAsync();
+        }
+        catch (Exception exception)
+        {
+            Console.WriteLine(exception.Message);
+        }
+
+        StateHasChanged();
+    }
+
 }
 
 

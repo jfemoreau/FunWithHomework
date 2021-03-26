@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace FunWithHomework.Controllers
 {
@@ -9,6 +10,7 @@ namespace FunWithHomework.Controllers
     {
         private uint numberOfAttemps = 1;
         private Tuple<int, int> _currentNumberTuple;
+        private JsonStorageController _jsonStorageController;
 
         protected MathOperationModel MathOperationModel;
         protected List<Tuple<int, int>> NumberTuples { get; set; }
@@ -22,7 +24,14 @@ namespace FunWithHomework.Controllers
         public int SecondNumber { get; protected set; }
         public bool Success { get; protected set; }
 
-        public void SetNextNumbers()
+        public MathOperation(JsonStorageController jsonStorageController)
+        {
+            _jsonStorageController = jsonStorageController;
+            var mathOperatioModel = GetDefaultModel();
+            SetMathOperationModel(mathOperatioModel);
+        }
+
+        public async Task SetNextNumbersAsync()
         {
             ResetAttemps();
             Answer = string.Empty;
@@ -31,6 +40,11 @@ namespace FunWithHomework.Controllers
             {
                 if (NumberTuples == null || NumberTuples.Count == 0)
                 {
+                    var model = await _jsonStorageController.Retrieve(MathOperationModel);
+                    if(model != null)
+                    {
+                        MathOperationModel = model;
+                    }
                     FillNumberTupleList();
                 }
 
@@ -46,13 +60,20 @@ namespace FunWithHomework.Controllers
 
         protected virtual void FillNumberTupleList()
         {
-            NumberTuples = new List<Tuple<int, int>>(MathOperationModel.FirstNumberRange.Item2 * MathOperationModel.SecondNumberRange.Item2);
+            if (MathOperationModel.FirstNumberRange.Max <= MathOperationModel.FirstNumberRange.Min)
+                MathOperationModel.FirstNumberRange.Max = MathOperationModel.FirstNumberRange.Min + 1;
 
-            for (int firstNumberIndex = MathOperationModel.FirstNumberRange.Item1; firstNumberIndex <= MathOperationModel.FirstNumberRange.Item2; firstNumberIndex++)
+            if (MathOperationModel.SecondNumberRange.Max <= MathOperationModel.SecondNumberRange.Min)
+                MathOperationModel.SecondNumberRange.Max = MathOperationModel.SecondNumberRange.Min + 1;
+
+
+            NumberTuples = new List<Tuple<int, int>>(Math.Abs(MathOperationModel.FirstNumberRange.Max * MathOperationModel.SecondNumberRange.Max));
+                       
+            for (int firstNumberIndex = MathOperationModel.FirstNumberRange.Min; firstNumberIndex <= MathOperationModel.FirstNumberRange.Max; firstNumberIndex++)
             {
-                var uperBound = MathOperationModel.AllowSecondNumberToBeGreater ? MathOperationModel.SecondNumberRange.Item2 : firstNumberIndex;
+                var uperBound = MathOperationModel.AllowSecondNumberToBeGreater ? MathOperationModel.SecondNumberRange.Max : firstNumberIndex;
 
-                for (int secondNumberIndex = MathOperationModel.SecondNumberRange.Item1; secondNumberIndex <= uperBound; secondNumberIndex++)
+                for (int secondNumberIndex = MathOperationModel.SecondNumberRange.Min; secondNumberIndex <= uperBound; secondNumberIndex++)
                 {
                     NumberTuples.Add(new Tuple<int, int>(firstNumberIndex, secondNumberIndex));
                 }
@@ -62,9 +83,10 @@ namespace FunWithHomework.Controllers
         private void ResetAttemps()
         {
             numberOfAttemps = 1;
+
         }
 
-        public void Verify()
+        public async Task Verify()
         {
             if (MathOperationModel == null)
             {
@@ -84,8 +106,8 @@ namespace FunWithHomework.Controllers
                     VerificationMessage = "Bonne réponse!";
                     LastAnswer = $"{FirstNumber} {MathOperationModel.Symbol} {SecondNumber} = {answerInInt}";
 
-                    NumberTuples.Remove(_currentNumberTuple);
-                    SetNextNumbers();
+                    NumberTuples?.Remove(_currentNumberTuple);
+                    await SetNextNumbersAsync();
                 }
                 else
                 {
@@ -97,7 +119,7 @@ namespace FunWithHomework.Controllers
                     else
                     {
                         VerificationMessage = $"La bonne réponse est {FirstNumber} {MathOperationModel.Symbol} {SecondNumber} = {rightAnswer}.";
-                        SetNextNumbers();
+                        await SetNextNumbersAsync();
                     }
 
                     LastAnswer = string.Empty;
@@ -118,6 +140,26 @@ namespace FunWithHomework.Controllers
             }
             MathOperationModel = mathOperationModel;
         }
+
+        public MathOperationModel GetMathOperationModel()
+        {
+            if (MathOperationModel == null)
+            {
+                return null;
+            }
+
+            return MathOperationModel.Clone() as MathOperationModel;
+        }
+
+        public void ResetNumbers()
+        {
+            NumberTuples = null;
+            Success = false;
+            VerificationMessage = string.Empty;
+            LastAnswer = string.Empty;
+            Answer = string.Empty;
+        }
         protected abstract int Operation(int firstNumber, int secondNumber);
+        public abstract MathOperationModel GetDefaultModel();
     }
 }

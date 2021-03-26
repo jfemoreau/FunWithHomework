@@ -6,31 +6,43 @@ namespace FunWithHomework.Controllers
 {
     public class Division : MathOperation
     {
-        public Division()
+        public Division(JsonStorageController jsonStorageController) : base(jsonStorageController)
         {
-            var mathOperatioModel = new MathOperationModel("Division", "÷", new Tuple<int, int>(1, 12), new Tuple<int, int>(1, 12), false);
-            SetMathOperationModel(mathOperatioModel);
         }
 
         protected override int Operation(int firstNumber, int secondNumber)
         {
+            if (secondNumber == 0)
+                return 0;
+
             return firstNumber / secondNumber;
         }
 
         protected override void FillNumberTupleList()
         {
-            NumberTuples = new List<Tuple<int, int>>(MathOperationModel.FirstNumberRange.Item2 * MathOperationModel.SecondNumberRange.Item2);
+            if (MathOperationModel.FirstNumberRange.Max <= MathOperationModel.FirstNumberRange.Min)
+                MathOperationModel.FirstNumberRange.Max = MathOperationModel.FirstNumberRange.Min + 1;
 
-            for (int firstNumberIndex = MathOperationModel.FirstNumberRange.Item1; firstNumberIndex <= MathOperationModel.FirstNumberRange.Item2; firstNumberIndex++)
+            if (MathOperationModel.SecondNumberRange.Max <= MathOperationModel.SecondNumberRange.Min)
+                MathOperationModel.SecondNumberRange.Max = MathOperationModel.SecondNumberRange.Min + 1;
+
+            NumberTuples = new List<Tuple<int, int>>(Math.Abs(MathOperationModel.FirstNumberRange.Max * MathOperationModel.SecondNumberRange.Max));
+
+            for (int firstNumberIndex = MathOperationModel.FirstNumberRange.Min; firstNumberIndex <= MathOperationModel.FirstNumberRange.Max; firstNumberIndex++)
             {
-                for (int secondNumberIndex = MathOperationModel.SecondNumberRange.Item1; secondNumberIndex <= firstNumberIndex; secondNumberIndex++)
+                for (int secondNumberIndex = MathOperationModel.SecondNumberRange.Min; secondNumberIndex <= firstNumberIndex; secondNumberIndex++)
                 {
-                    if (firstNumberIndex % secondNumberIndex == 0)
+                    if (secondNumberIndex != 0 && firstNumberIndex % secondNumberIndex == 0)
                     {
                         NumberTuples.Add(new Tuple<int, int>(firstNumberIndex, secondNumberIndex));
                     }
                 }
             }
+        }
+
+        public override MathOperationModel GetDefaultModel()
+        {
+            return new MathOperationModel("Division", "÷", new Models.Range(1, 12), new Models.Range(1, 12), 3, false, false);
         }
     }
 }

@@ -1,0 +1,56 @@
+﻿@using FunWithHomework.Models
+@inject FunWithHomework.Controllers.JsonStorageController storageController
+
+<button  style="display:inline-block;" class="btn" @onclick="() => _modal.Open()"><i class="oi oi-pencil"></i></button>
+
+<ModalWindowComponent @ref="_modal">
+    <Title><em>Options: @MathOperationModel.Title</em></Title>
+    <Body>
+        <p>Premier Nombre:</p>
+        <p>De <input @bind="MathOperationModel.FirstNumberRange.Min" /> à <input @bind="MathOperationModel.FirstNumberRange.Max" /></p>
+
+        <p>Deuxième Nombre:</p>
+        <p>De <input @bind="MathOperationModel.SecondNumberRange.Min" /> à <input @bind="MathOperationModel.SecondNumberRange.Max" /></p>
+
+        @if (MathOperationModel.ShowAllowSecondNumberToBeGreaterSetting)
+        {
+            <p><input type="checkbox" id="AllowSecondNumberToBeGreater" @bind="MathOperationModel.AllowSecondNumberToBeGreater" /> <label for="AllowSecondNumberToBeGreater">Le deuxième nombre peut être plus grand que le premier.</label></p>
+        }
+
+        <p>Nombre d'essais:</p>
+        <p><input @bind="MathOperationModel.NumberAttemps" /></p>
+
+    </Body>
+    <Footer>
+        <button type="button" class="btn btn-primary" @onclick="RestoreDefault">Réinitialiser la valeur par défaut</button>
+        <button type="button" class="btn btn-primary" @onclick="Save">Sauvegarder</button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal" @onclick="() => _modal.Close()">Fermer</button>
+    </Footer>
+</ModalWindowComponent>
+
+@code {
+    private ModalWindowComponent _modal { get; set; }
+
+    [Parameter]
+    public MathOperationModel MathOperationModel { get; set; }
+
+    [Parameter]
+    public MathOperationModel DefaultMathOperationModel { get; set; }
+
+    [Parameter]
+    public EventCallback<MathOperationModel> OnSave { get; set; }
+
+    private void RestoreDefault()
+    {
+        MathOperationModel = DefaultMathOperationModel;
+        StateHasChanged();
+    }
+
+    private async Task Save()
+    {
+        await storageController.Store(MathOperationModel);
+        await OnSave.InvokeAsync(MathOperationModel);
+        _modal.Close();
+
+    }
+}

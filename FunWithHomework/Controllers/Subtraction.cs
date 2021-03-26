@@ -6,10 +6,13 @@ namespace FunWithHomework.Controllers
 {
     public class Subtraction : MathOperation
     {
-        public Subtraction()
+        public Subtraction(JsonStorageController jsonStorageController) : base(jsonStorageController)
         {
-            var mathOperatioModel = new MathOperationModel("Soustraction", "-", new Tuple<int, int>(0, 100), new Tuple<int, int>(0, 100), false);
-            SetMathOperationModel(mathOperatioModel);
+        }
+
+        public override MathOperationModel GetDefaultModel()
+        {
+            return new MathOperationModel("Soustraction", "-", new Models.Range(0, 100), new Models.Range(0, 100), 3, true, false);
         }
 
         protected override int Operation(int firstNumber, int secondNumber)

@@ -5,10 +5,13 @@ namespace FunWithHomework.Controllers
 {
     public class Addition : MathOperation
     {
-        public Addition()
+        public Addition(JsonStorageController jsonStorageController) : base(jsonStorageController)
+        {            
+        }
+
+        public override MathOperationModel GetDefaultModel()
         {
-            var mathOperatioModel = new MathOperationModel("Addition", "+", new Tuple<int, int>(0, 100), new Tuple<int, int>(0, 100));
-            SetMathOperationModel(mathOperatioModel);
+            return new MathOperationModel("Addition", "+", new Models.Range(0, 100), new Models.Range(0, 100), 3, true, true);
         }
 
         protected override int Operation(int firstNumber, int secondNumber)

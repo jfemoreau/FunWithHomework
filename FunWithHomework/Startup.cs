@@ -1,9 +1,11 @@
+using Blazored.LocalStorage;
 using FunWithHomework.Controllers;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Toolbelt.Blazor.Extensions.DependencyInjection;
 
 namespace FunWithHomework
 {
@@ -22,7 +24,12 @@ namespace FunWithHomework
         {
             services.AddRazorPages();
             services.AddServerSideBlazor();
+            services.AddBlazoredLocalStorage(config =>
+                        config.JsonSerializerOptions.WriteIndented = true);
 
+            services.AddSpeechSynthesis();
+
+            services.AddTransient<JsonStorageController>();
             services.AddTransient<Addition>();
             services.AddTransient<Subtraction>();
             services.AddTransient<Multiplication>();

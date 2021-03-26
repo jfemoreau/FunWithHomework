@@ -1,0 +1,43 @@
+﻿@using Toolbelt.Blazor.SpeechSynthesis
+@inject SpeechSynthesis SpeechSynthesis
+<button class="btn" @onclick="onClickSpeak"><i class="fa fa-play"></i></button>
+
+@code {
+    private string _language = "fr-Latn-CA";
+
+    [Parameter]
+    public string Text { get; set; } = "Salut";
+
+    [Parameter]
+    public string Language
+    {
+        get => _language;
+        set
+        {
+            if (value.Equals("fr", StringComparison.InvariantCultureIgnoreCase))
+                _language = "fr-Latn-CA";
+            else if (value.Equals("en", StringComparison.InvariantCultureIgnoreCase))
+                _language = "en-CA";
+            else
+                _language = value;
+        }
+    }
+
+    private void onClickSpeak()
+    {
+        Speak();
+    }
+
+    public void Speak()
+    {
+        var utterance = new SpeechSynthesisUtterance
+        {
+            Text = Text,
+            Lang = Language, // BCP 47 language tag
+            Pitch = 1.0, // 0.0 ~ 2.0 (Default 1.0)
+            Rate = 0.9, // 0.1 ~ 10.0 (Default 1.0)
+            Volume = 1.0
+        };
+        SpeechSynthesis.Speak(utterance);
+    }
+}

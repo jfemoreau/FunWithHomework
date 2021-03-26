@@ -40,9 +40,17 @@
         "net5.0": {
           "targetAlias": "net5.0",
           "dependencies": {
+            "Blazored.LocalStorage": {
+              "target": "Package",
+              "version": "[3.0.0, )"
+            },
             "Microsoft.VisualStudio.Azure.Containers.Tools.Targets": {
               "target": "Package",
               "version": "[1.10.9, )"
+            },
+            "Toolbelt.Blazor.SpeechSynthesis": {
+              "target": "Package",
+              "version": "[8.1.0, )"
             }
           },
           "imports": [
