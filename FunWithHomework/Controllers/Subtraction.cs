@@ -12,7 +12,7 @@ namespace FunWithHomework.Controllers
 
         public override MathOperationModel GetDefaultModel()
         {
-            return new MathOperationModel("Soustraction", "-", new Models.Range(0, 100), new Models.Range(0, 100), 3, true, true);
+            return new MathOperationModel("Soustraction", "-", new Models.Range(0, 100), new Models.Range(0, 100), 3, false, true);
         }
 
         protected override int Operation(int firstNumber, int secondNumber)
