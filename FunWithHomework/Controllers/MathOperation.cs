@@ -45,7 +45,8 @@ namespace FunWithHomework.Controllers
                     {
                         MathOperationModel = model;
                     }
-                    FillNumberTupleList();
+                    
+                    await Task.Run(() => FillNumberTupleList());
                 }
 
                 var random = new Random();
@@ -60,15 +61,12 @@ namespace FunWithHomework.Controllers
 
         protected virtual void FillNumberTupleList()
         {
-            if (MathOperationModel.FirstNumberRange.Max <= MathOperationModel.FirstNumberRange.Min)
-                MathOperationModel.FirstNumberRange.Max = MathOperationModel.FirstNumberRange.Min + 1;
+            VerifyAndCorrectRange();
 
-            if (MathOperationModel.SecondNumberRange.Max <= MathOperationModel.SecondNumberRange.Min)
-                MathOperationModel.SecondNumberRange.Max = MathOperationModel.SecondNumberRange.Min + 1;
+            var numberOfEntries = Math.Abs(MathOperationModel.FirstNumberRange.Max * MathOperationModel.SecondNumberRange.Max);
 
+            NumberTuples = new List<Tuple<int, int>>(numberOfEntries > 1000 ? 1000 : numberOfEntries) ;
 
-            NumberTuples = new List<Tuple<int, int>>(Math.Abs(MathOperationModel.FirstNumberRange.Max * MathOperationModel.SecondNumberRange.Max));
-                       
             for (int firstNumberIndex = MathOperationModel.FirstNumberRange.Min; firstNumberIndex <= MathOperationModel.FirstNumberRange.Max; firstNumberIndex++)
             {
                 var uperBound = MathOperationModel.AllowSecondNumberToBeGreater ? MathOperationModel.SecondNumberRange.Max : firstNumberIndex;
@@ -78,6 +76,21 @@ namespace FunWithHomework.Controllers
                     NumberTuples.Add(new Tuple<int, int>(firstNumberIndex, secondNumberIndex));
                 }
             }
+        }
+
+        protected void VerifyAndCorrectRange()
+        {
+            if (MathOperationModel.FirstNumberRange.Max <= MathOperationModel.FirstNumberRange.Min)
+                MathOperationModel.FirstNumberRange.Max = MathOperationModel.FirstNumberRange.Min + 1;
+
+            if (MathOperationModel.SecondNumberRange.Max <= MathOperationModel.SecondNumberRange.Min)
+                MathOperationModel.SecondNumberRange.Max = MathOperationModel.SecondNumberRange.Min + 1;
+
+            if (MathOperationModel.FirstNumberRange.Max - MathOperationModel.FirstNumberRange.Min >= 10000)
+                MathOperationModel.FirstNumberRange.Max = MathOperationModel.FirstNumberRange.Min + 10000;
+
+            if (MathOperationModel.SecondNumberRange.Max - MathOperationModel.SecondNumberRange.Min >= 10000)
+                MathOperationModel.SecondNumberRange.Max = MathOperationModel.SecondNumberRange.Min + 10000;
         }
 
         private void ResetAttemps()

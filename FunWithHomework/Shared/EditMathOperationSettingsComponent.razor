@@ -22,8 +22,8 @@
 
     </Body>
     <Footer>
-        <button type="button" class="btn btn-primary" @onclick="RestoreDefault">Réinitialiser la valeur par défaut</button>
         <button type="button" class="btn btn-primary" @onclick="Save">Sauvegarder</button>
+        <button type="button" class="btn btn-secondary" @onclick="RestoreDefault">Réinitialiser</button>
         <button type="button" class="btn btn-secondary" data-dismiss="modal" @onclick="() => _modal.Close()">Fermer</button>
     </Footer>
 </ModalWindowComponent>
@@ -42,7 +42,7 @@
 
     private void RestoreDefault()
     {
-        MathOperationModel = DefaultMathOperationModel;
+        MathOperationModel = DefaultMathOperationModel.Clone() as MathOperationModel;
         StateHasChanged();
     }
 

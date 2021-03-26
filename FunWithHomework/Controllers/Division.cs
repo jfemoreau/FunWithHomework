@@ -20,13 +20,11 @@ namespace FunWithHomework.Controllers
 
         protected override void FillNumberTupleList()
         {
-            if (MathOperationModel.FirstNumberRange.Max <= MathOperationModel.FirstNumberRange.Min)
-                MathOperationModel.FirstNumberRange.Max = MathOperationModel.FirstNumberRange.Min + 1;
+            VerifyAndCorrectRange();
 
-            if (MathOperationModel.SecondNumberRange.Max <= MathOperationModel.SecondNumberRange.Min)
-                MathOperationModel.SecondNumberRange.Max = MathOperationModel.SecondNumberRange.Min + 1;
+            var numberOfEntries = Math.Abs(MathOperationModel.FirstNumberRange.Max * MathOperationModel.SecondNumberRange.Max);
 
-            NumberTuples = new List<Tuple<int, int>>(Math.Abs(MathOperationModel.FirstNumberRange.Max * MathOperationModel.SecondNumberRange.Max));
+            NumberTuples = new List<Tuple<int, int>>(numberOfEntries > 1000 ? 1000 : numberOfEntries);
 
             for (int firstNumberIndex = MathOperationModel.FirstNumberRange.Min; firstNumberIndex <= MathOperationModel.FirstNumberRange.Max; firstNumberIndex++)
             {
