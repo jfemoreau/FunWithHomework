@@ -113,7 +113,10 @@ namespace FunWithHomework.Controllers
                 }
                 else
                 {
-                    hint += "_";
+                    if (CurrentWord[index] == ' ')
+                        hint += " ";
+                    else
+                        hint += "_";
                 }
             }
             return hint;
