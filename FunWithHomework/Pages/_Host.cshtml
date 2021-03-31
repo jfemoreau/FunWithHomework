@@ -100,6 +100,16 @@
             link.click();
             document.body.removeChild(link);
         }
+
+        function SetFocusById(elementId) {
+            var element = document.getElementById(elementId);
+            if (element == null) {
+                return;
+            }
+
+            element.focus();
+        }
+
     </script>
 
 </body>

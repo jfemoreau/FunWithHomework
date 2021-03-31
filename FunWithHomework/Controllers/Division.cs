@@ -40,7 +40,7 @@ namespace FunWithHomework.Controllers
 
         public override MathOperationModel GetDefaultModel()
         {
-            return new MathOperationModel("Division", "÷", new Models.Range(1, 12), new Models.Range(1, 12), 3, false, false);
+            return new MathOperationModel("Division", "÷", new Models.Range(1, 100), new Models.Range(1, 12), 3, false, false);
         }
     }
 }

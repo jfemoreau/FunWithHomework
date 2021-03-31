@@ -1,0 +1,64 @@
+﻿@using FunWithHomework.Controllers
+@using FunWithHomework.Models
+
+@inject IJSRuntime JSRuntime
+@inject AdvancedDivision AdvancedDivision
+
+<h1 class="d-inline">@AdvancedDivision.Title</h1>
+<EditMathOperationSettingsComponent MathOperationModel="@AdvancedDivision.GetMathOperationModel()" DefaultMathOperationModel="@AdvancedDivision.GetDefaultModel()" OnSave="@Save" />
+
+<h4>@AdvancedDivision.FirstNumber @AdvancedDivision.Symbol @AdvancedDivision.SecondNumber = </h4>
+<input id="AnwserInput" @bind="AdvancedDivision.Answer" @onkeyup="OnKeyup" type="number" /> Reste
+<input @bind="AdvancedDivision.ModuloAnswer" @onkeyup="OnKeyup" type="number" />
+<button class="btn" @onclick="@AdvancedDivision.Verify"><i class="oi oi-check"></i></button>
+
+<h1>@AdvancedDivision.VerificationMessage</h1>
+<h1>@AdvancedDivision.LastAnswer</h1>
+
+
+@code {
+
+    private async void OnKeyup(KeyboardEventArgs e)
+    {
+        if (e.Code == "Enter" || e.Code == "NumpadEnter")
+        {
+            await AdvancedDivision.Verify();
+            await JSRuntime.InvokeAsync<object>("SetFocusById", "AnwserInput");
+        }
+    }
+
+    private async void Save(MathOperationModel operationModel)
+    {
+        AdvancedDivision.ResetNumbers();
+        AdvancedDivision.SetMathOperationModel(operationModel);
+
+        await Update();
+    }
+
+    protected override async void OnAfterRender(bool firstRender)
+    {
+        if (firstRender)
+            await Update();
+
+        base.OnAfterRender(firstRender);
+    }
+
+
+
+    private async Task Update()
+    {
+        try
+        {
+            await AdvancedDivision.SetNextNumbersAsync();
+        }
+        catch (Exception exception)
+        {
+            Console.WriteLine(exception.Message);
+        }
+
+        StateHasChanged();
+    }
+
+}
+
+

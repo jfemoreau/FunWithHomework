@@ -8,13 +8,16 @@ namespace FunWithHomework.Controllers
 {
     public abstract class MathOperation
     {
-        private uint numberOfAttemps = 1;
-        private Tuple<int, int> _currentNumberTuple;
         private JsonStorageController _jsonStorageController;
+        protected const string GoodAnswerMessage = "Bonne réponse!";
+        protected const string BadAnswerMessage = "Mauvaise réponse.";
+        protected const string EnterANumberMessage = "Entre un nombre.";
+        protected const string GoodAnswerIsMessage = "La bonne réponse est";
 
         protected MathOperationModel MathOperationModel;
         protected List<Tuple<int, int>> NumberTuples { get; set; }
-
+        protected Tuple<int, int> CurrentNumberTuple { get; set; }
+        protected uint NumberOfAttemps { get; set; } = 1;
         public string Title { get => MathOperationModel?.Title; }
         public string Symbol { get => MathOperationModel?.Symbol; }
         public string VerificationMessage { get; protected set; } = string.Empty;
@@ -34,7 +37,7 @@ namespace FunWithHomework.Controllers
         public async Task SetNextNumbersAsync()
         {
             ResetAttemps();
-            Answer = string.Empty;
+            ResetAnswer();
 
             if (MathOperationModel != null)
             {
@@ -52,10 +55,10 @@ namespace FunWithHomework.Controllers
                 var random = new Random();
                 var currentNumberTupleIndex = random.Next(0, NumberTuples.Count - 1);
 
-                _currentNumberTuple = NumberTuples.ElementAt(currentNumberTupleIndex);
+                CurrentNumberTuple = NumberTuples.ElementAt(currentNumberTupleIndex);
 
-                FirstNumber = _currentNumberTuple.Item1;
-                SecondNumber = _currentNumberTuple.Item2;
+                FirstNumber = CurrentNumberTuple.Item1;
+                SecondNumber = CurrentNumberTuple.Item2;
             }
         }
 
@@ -95,16 +98,13 @@ namespace FunWithHomework.Controllers
 
         private void ResetAttemps()
         {
-            numberOfAttemps = 1;
+            NumberOfAttemps = 1;
 
         }
 
-        public async Task Verify()
+        public virtual async Task Verify()
         {
-            if (MathOperationModel == null)
-            {
-                throw new InvalidOperationException("Math operation model is not set.");
-            }
+            AssertMathOperationModelNotNull();
 
             Success = false;
             VerificationMessage = string.Empty;
@@ -116,22 +116,22 @@ namespace FunWithHomework.Controllers
                 Success = rightAnswer == answerInInt;
                 if (Success)
                 {
-                    VerificationMessage = "Bonne réponse!";
+                    VerificationMessage = GoodAnswerMessage;
                     LastAnswer = $"{FirstNumber} {MathOperationModel.Symbol} {SecondNumber} = {answerInInt}";
 
-                    NumberTuples?.Remove(_currentNumberTuple);
+                    NumberTuples?.Remove(CurrentNumberTuple);
                     await SetNextNumbersAsync();
                 }
                 else
                 {
-                    if (numberOfAttemps < MathOperationModel.NumberAttemps)
+                    if (NumberOfAttemps < MathOperationModel.NumberAttemps)
                     {
-                        numberOfAttemps++;
-                        VerificationMessage = "Mauvaise réponse.";
+                        NumberOfAttemps++;
+                        VerificationMessage = BadAnswerMessage;
                     }
                     else
                     {
-                        VerificationMessage = $"La bonne réponse est {FirstNumber} {MathOperationModel.Symbol} {SecondNumber} = {rightAnswer}.";
+                        VerificationMessage = $"{GoodAnswerIsMessage} {FirstNumber} {MathOperationModel.Symbol} {SecondNumber} = {rightAnswer}.";
                         await SetNextNumbersAsync();
                     }
 
@@ -140,7 +140,7 @@ namespace FunWithHomework.Controllers
             }
             else
             {
-                VerificationMessage = "Entre un nombre.";
+                VerificationMessage = EnterANumberMessage;
                 LastAnswer = string.Empty;
             }
         }
@@ -170,9 +170,22 @@ namespace FunWithHomework.Controllers
             Success = false;
             VerificationMessage = string.Empty;
             LastAnswer = string.Empty;
-            Answer = string.Empty;
+            ResetAnswer();
         }
         protected abstract int Operation(int firstNumber, int secondNumber);
         public abstract MathOperationModel GetDefaultModel();
+
+        protected virtual void ResetAnswer()
+        {
+            Answer = string.Empty;
+        }
+
+        protected void AssertMathOperationModelNotNull()
+        {
+            if (MathOperationModel == null)
+            {
+                throw new InvalidOperationException("Math operation model is not set.");
+            }
+        }
     }
 }
