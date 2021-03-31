@@ -99,6 +99,7 @@ namespace FunWithHomework.Controllers
             else
             {
                 VerificationMessage = "Bonne réponse! La dictée est complétée.";
+                LastAnswer = "Bravo!";
             }
         }
 
