@@ -18,6 +18,10 @@ a, .btn-link {
     border-color: #1861ac;
 }
 
+.spellingTitle {
+    color: #2fa4e7;
+}
+
 app {
     position: relative;
     display: flex;
@@ -139,6 +143,18 @@ app {
         right: 0.75rem;
         top: 0.5rem;
     }
+
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+/* Firefox */
+input[type=number] {
+    -moz-appearance: textfield;
+}
 
 @media (max-width: 767.98px) {
     .main .top-row:not(.auth) {

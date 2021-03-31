@@ -1,0 +1,82 @@
+﻿@using FunWithHomework.Models
+@using FunWithHomework.Controllers
+@using System.Text.Json
+
+@inject IJSRuntime JSRuntime
+@inject RunSpellingController _runSpellingController
+
+<button class="btn d-inline" @onclick="Open"><i class="oi oi-media-play"></i></button>
+
+<ModalWindowComponent @ref="_modal">
+    <Title><em>@Spelling.Title</em></Title>
+    <Body>
+        <h4 style="letter-spacing: 5px;">@_runSpellingController.Hint</h4>
+        <input @bind="_runSpellingController.Answer" @onkeyup="OnKeyup" @bind:event="oninput" />
+        <button class="btn" @onclick="_runSpellingController.Verify"><i class="oi oi-check"></i></button>
+        <button class="btn" @onclick="_runSpellingController.Speak"><i class="oi oi-media-play"></i></button>
+        <button class="btn" @onclick="_runSpellingController.ToggleHint"><i class="oi oi-info"></i></button>
+
+        <h1>@_runSpellingController.VerificationMessage</h1>
+        <h1>@_runSpellingController.LastAnswer</h1>
+
+    </Body>
+    <Footer>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal" @onclick="Restart">Recommencer</button>
+        <button type="button" class="btn btn-primary" data-dismiss="modal" @onclick="Close">Fermer</button>
+    </Footer>
+</ModalWindowComponent>
+
+@code {
+    private ModalWindowComponent _modal { get; set; }
+    private bool _wasCollapsed;
+
+    [Parameter]
+    public Spelling Spelling { get; set; }
+
+    [Parameter]
+    public string CurrentId { get; set; }
+
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+        _runSpellingController.Language = Spelling.Language;
+    }
+
+    private void OnKeyup(KeyboardEventArgs e)
+    {
+        if (e.Code == "Enter" || e.Code == "NumpadEnter")
+        {
+            _runSpellingController.Verify();
+        }
+        else
+        {
+            _runSpellingController.UpdateHint();
+        }
+    }
+
+    private void Restart()
+    {
+        _runSpellingController.SetWords(Spelling.Words.ToList());
+    }
+
+    private async Task Open()
+    {
+        _modal.Open();
+        _runSpellingController.SetWords(Spelling.Words.ToList());
+        var element = (JsonElement) await JSRuntime.InvokeAsync<object>("ContainsClassById", CurrentId, "collapse");
+        _wasCollapsed = element.GetBoolean();
+        if(!_wasCollapsed)
+            await JSRuntime.InvokeAsync<object>("AddClassById", CurrentId, "collapse");
+    }
+
+    private async Task Close()
+    {
+        if (!_wasCollapsed)
+        {
+            await JSRuntime.InvokeAsync<object>("RemoveClassById", CurrentId, "collapse");
+        }
+
+        _modal.Close();
+    }
+}

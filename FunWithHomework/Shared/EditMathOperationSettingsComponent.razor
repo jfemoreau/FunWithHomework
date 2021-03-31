@@ -1,16 +1,16 @@
 ﻿@using FunWithHomework.Models
 @inject FunWithHomework.Controllers.JsonStorageController storageController
 
-<button  style="display:inline-block;" class="btn" @onclick="() => _modal.Open()"><i class="oi oi-pencil"></i></button>
+<button class="btn d-inline" @onclick="() => _modal.Open()"><i class="oi oi-pencil"></i></button>
 
 <ModalWindowComponent @ref="_modal">
     <Title><em>Options: @MathOperationModel.Title</em></Title>
     <Body>
         <p>Premier Nombre:</p>
-        <p>De <input @bind="MathOperationModel.FirstNumberRange.Min" /> à <input @bind="MathOperationModel.FirstNumberRange.Max" /></p>
+        <p>De <input @bind="MathOperationModel.FirstNumberRange.Min" type="number" /> à <input @bind="MathOperationModel.FirstNumberRange.Max" type="number" /></p>
 
         <p>Deuxième Nombre:</p>
-        <p>De <input @bind="MathOperationModel.SecondNumberRange.Min" /> à <input @bind="MathOperationModel.SecondNumberRange.Max" /></p>
+        <p>De <input @bind="MathOperationModel.SecondNumberRange.Min" type="number"/> à <input @bind="MathOperationModel.SecondNumberRange.Max" type="number"/></p>
 
         @if (MathOperationModel.ShowAllowSecondNumberToBeGreaterSetting)
         {

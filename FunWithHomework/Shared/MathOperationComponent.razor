@@ -1,10 +1,10 @@
 ﻿@using FunWithHomework.Controllers
 @using FunWithHomework.Models
 
-<h3 style="display:inline-block;">@Operation.Title</h3><EditMathOperationSettingsComponent MathOperationModel="@Operation.GetMathOperationModel()" DefaultMathOperationModel="@Operation.GetDefaultModel()" OnSave="@Save" />
+<h1 class="d-inline">@Operation.Title</h1><EditMathOperationSettingsComponent MathOperationModel="@Operation.GetMathOperationModel()" DefaultMathOperationModel="@Operation.GetDefaultModel()" OnSave="@Save" />
 
 <h4>@Operation.FirstNumber @Operation.Symbol @Operation.SecondNumber = </h4>
-<input @bind="Operation.Answer" @onkeyup="OnKeyup" />
+<input @bind="Operation.Answer" @onkeyup="OnKeyup" type="number"/>
 <button class="btn" @onclick="@Operation.Verify"><i class="oi oi-check"></i></button>
 
 <h1>@Operation.VerificationMessage</h1>

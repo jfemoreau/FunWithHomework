@@ -30,10 +30,12 @@ namespace FunWithHomework
             services.AddSpeechSynthesis();
 
             services.AddTransient<JsonStorageController>();
+            services.AddTransient<SpellingsController>();
+            services.AddTransient<RunSpellingController>();
             services.AddTransient<Addition>();
             services.AddTransient<Subtraction>();
             services.AddTransient<Multiplication>();
-            services.AddTransient<Division>();
+            services.AddTransient<Division>();            
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

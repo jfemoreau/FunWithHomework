@@ -33,5 +33,74 @@
     </div>
 
     <script src="_framework/blazor.server.js"></script>
+    <script>
+        function ToggleClass(element, className) {
+            if (element == null) {
+                return;
+            }
+
+            if (element.classList.contains(className)) {
+                element.classList.remove(className);
+            } else {
+                element.classList.add(className);
+            }
+        }
+
+        function ToggleClassById(elementId, className) {
+            element = document.getElementById(elementId);
+            ToggleClass(element, className);
+        }
+
+        function AddClass(element, className) {
+            if (element == null) {
+                return;
+            }
+
+            element.classList.add(className);           
+        }
+
+        function AddClassById(elementId, className) {
+            element = document.getElementById(elementId);
+            AddClass(element, className);
+        }
+
+        function RemoveClassById(elementId, className) {
+            element = document.getElementById(elementId);
+            RemoveClass(element, className);
+        }
+
+        function RemoveClass(element, className) {
+            if (element == null) {
+                return;
+            }
+
+            if (element.classList.contains(className)) {
+                element.classList.remove(className);
+            }
+        }
+
+        function ContainsClassById(elementId, className) {
+            element = document.getElementById(elementId);
+            return ContainsClass(element, className);
+        }
+
+        function ContainsClass(element, className) {
+            if (element == null) {
+                return false;
+            }
+
+            return element.classList.contains(className);
+        }
+
+        function FileSaveAs(filename, fileContent) {
+            var link = document.createElement('a');
+            link.download = filename;
+            link.href = "data:text/plain;charset=utf-8," + encodeURIComponent(fileContent)
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    </script>
+
 </body>
 </html>

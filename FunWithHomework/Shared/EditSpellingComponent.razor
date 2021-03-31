@@ -1,0 +1,88 @@
+﻿@using FunWithHomework.Models
+@using FunWithHomework.Controllers
+
+
+
+<button class="btn d-inline" @onclick="() => _modal.Open()"><i class="oi @_buttonIconClass"></i></button>
+
+<ModalWindowComponent @ref="_modal">
+    <Title><em>@_title</em></Title>
+    <Body>
+        <p>Nom:</p>
+        <p><input @bind="Spelling.Title" /></p>
+
+        <p>Langue:</p>
+        <p><select @bind="Spelling.Language"><option value="Fr">Français</option><option value="En">Englais</option></select></p>
+
+        <p>Liste de mots:</p>
+        <p><textarea @bind="_words" cols="40" rows="15"></textarea></p>
+
+    </Body>
+    <Footer>
+        <button type="button" class="btn btn-primary" @onclick="Save">@_saveText</button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal" @onclick="() => _modal.Close()">Fermer</button>
+    </Footer>
+</ModalWindowComponent>
+
+@code {
+    private ModalWindowComponent _modal { get; set; }
+    private string _words;
+    private string _title;
+    private string _saveText;
+    private string _buttonIconClass;
+
+    [Parameter]
+    public Spelling Spelling { get; set; }
+
+    [Parameter]
+    public Spelling OldSpelling { get; set; }
+
+    [Parameter]
+    public bool IsExisting { get; set; }
+
+    [Parameter]
+    public SpellingsController SpellingsController { get; set; }
+
+    [Parameter]
+    public EventCallback OnSave { get; set; }
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+        _title = IsExisting ? $"Modifier {Spelling.Title}" : "Nouvelle Dictée";
+        _saveText = IsExisting ? "Sauvegarder" : "Créer";
+        _buttonIconClass = IsExisting ? "oi-pencil" : "oi-plus";
+
+        _words = string.Empty;
+
+        foreach (var word in Spelling.Words)
+        {
+            _words += word;
+            _words += "\n";
+        }
+    }
+
+    private async Task Save()
+    {
+        string[] words = _words.Split(new string[] { "\n", "\r\n" }, StringSplitOptions.RemoveEmptyEntries);
+
+        Spelling.Words = new List<string>(words);
+
+        if (IsExisting)
+        {
+            if(OldSpelling != null)
+                SpellingsController.Remove(OldSpelling);
+
+            SpellingsController.Add(Spelling);
+        }
+        else
+        {
+            SpellingsController.Add(Spelling);
+        }
+
+        await SpellingsController.StoreData();
+        await OnSave.InvokeAsync();
+
+        _modal.Close();
+    }
+}

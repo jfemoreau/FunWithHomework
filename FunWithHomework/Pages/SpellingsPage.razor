@@ -1,0 +1,196 @@
+﻿@page "/Dictees"
+
+@using System.IO
+@using FunWithHomework.Controllers
+@using FunWithHomework.Models
+
+@inject SpellingsController _spellingsController
+@inject IJSRuntime JSRuntime
+
+<h1 class="d-inline">Dictées</h1><EditSpellingComponent SpellingsController="_spellingsController" IsExisting="false" OldSpelling="null" Spelling="GetNewSpelling()" OnSave="Update" />
+<button class="btn d-inline"><i class="oi oi-cloud-download" @onclick="DownloadSpellings"></i></button>
+<button class="btn d-inline"><i class="oi oi-cloud-upload" @onclick="e => { _importModal.Open();  }"></i></button>
+<button class="btn d-inline"><i class="oi oi-trash" @onclick="e => { _deleteAllModal.Open();  }"></i></button>
+
+@if (_sortedSpellings != null)
+{
+    var spellingNumber = 0;
+    var idPrefix = "spelling";
+
+
+    @foreach (var spelling in _sortedSpellings)
+    {
+        var currentId = idPrefix + spellingNumber;
+
+        <div>
+            <div style="padding-top: 10px; padding-bottom: 10px;">
+                <h4 class="d-inline">
+                    <a class="spellingTitle" href="javascript:void(0);" onclick="ToggleClass(@currentId, 'collapse')">@spelling.Title</a>
+                </h4><RunSpellingComponent Spelling="spelling" CurrentId="@currentId" />
+                <EditSpellingComponent SpellingsController="_spellingsController" IsExisting="true" OldSpelling="spelling" Spelling="(Spelling)spelling.Clone()" OnSave="Update"/>
+                <button class="btn d-inline" @onclick="e => { SelectSpelling(spelling); _deleteModal.Open();  }"><i class="oi oi-trash"></i></button>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <div id="@currentId" class="collapse">
+                        <div class="card card-body">
+                            @foreach (var word in spelling.Words)
+                            {
+                                <p>@word</p>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        spellingNumber++;
+    }
+
+    <ModalWindowComponent @ref="_deleteModal">
+        <Title><em>@_selectedSpelling?.Title</em></Title>
+        <Body>
+            <p>Veux-tu supprimer cette dictée?</p>
+        </Body>
+        <Footer>
+            <button type="button" class="btn btn-warning" @onclick="Delete">Supprimer</button>
+            <button type="button" class="btn btn-secondary" data-dismiss="modal" @onclick="() => _deleteModal.Close()">Annuler</button>
+        </Footer>
+    </ModalWindowComponent>
+
+    <ModalWindowComponent @ref="_deleteAllModal">
+        <Title><em>Supprimer toutes les dictées</em></Title>
+        <Body>
+            <p>Veux-tu supprimer toutes les dictées?</p>
+        </Body>
+        <Footer>
+            <button type="button" class="btn btn-warning" @onclick="DeleteAll">Supprimer</button>
+            <button type="button" class="btn btn-secondary" data-dismiss="modal" @onclick="() => _deleteAllModal.Close()">Annuler</button>
+        </Footer>
+    </ModalWindowComponent>
+
+    <ModalWindowComponent @ref="_importModal">
+        <Title><em>Importer des dictées</em></Title>
+        <Body>
+            <InputFile name="file" OnChange="@UploadSpellingChanged">Choisir le fichier</InputFile>
+        </Body>
+        <Footer>
+            <button type="button" class="btn btn-warning" @onclick="Import">Importer</button>
+            <button type="button" class="btn btn-secondary" data-dismiss="modal" @onclick="() => _importModal.Close()">Annuler</button>
+        </Footer>
+    </ModalWindowComponent>
+
+}
+
+
+@code{
+    private List<Spelling> _sortedSpellings;
+
+    private Spelling _selectedSpelling;
+
+    private ModalWindowComponent _deleteModal;
+    private ModalWindowComponent _deleteAllModal;
+
+    private ModalWindowComponent _importModal;
+
+    private IBrowserFile _fileToImport;
+
+    protected override async void OnAfterRender(bool firstRender)
+    {
+        if (firstRender)
+            await Update();
+
+        base.OnAfterRender(firstRender);
+    }
+
+    private async Task Update()
+    {
+        await Task.Run(async () =>
+        {
+            await _spellingsController.LoadData();
+            _sortedSpellings = _spellingsController.GetSortedList();
+        }
+        );
+        StateHasChanged();
+    }
+
+    private Spelling GetNewSpelling()
+    {
+        return new Spelling
+        {
+            DateCreated = DateTime.Now.ToLocalTime(),
+            Language = "Fr",
+            Title = "",
+            Words = new List<string> ()
+
+        };
+    }
+
+    private async Task DownloadSpellings()
+    {
+        var fileContent = _spellingsController.GetDownloadableFile();
+
+        await JSRuntime.InvokeAsync<object>("FileSaveAs", "Dictees.txt", fileContent);
+
+    }
+
+
+    private void UploadSpellingChanged(InputFileChangeEventArgs e)
+    {
+       _fileToImport = e.File;
+       
+    }
+
+    private async Task Import()
+    {
+        try
+        {
+            if (_fileToImport != null)
+            {
+                using var reader =
+                    new StreamReader(_fileToImport.OpenReadStream());
+
+
+                _spellingsController.LoadDataFromJasonList(await reader.ReadToEndAsync());
+            }
+        }
+        catch (Exception)
+        {
+
+        }
+
+        await _spellingsController.StoreData();
+        await Update();
+
+        _fileToImport = null;
+        _importModal.Close();
+    }
+
+    private void SelectSpelling(Spelling spelling)
+    {
+        _selectedSpelling = spelling;
+    }
+
+    private async Task Delete()
+    {
+        if (_selectedSpelling == null)
+        {
+            return;
+        }
+
+        _spellingsController.Remove(_selectedSpelling);
+        await _spellingsController.StoreData();
+        await Update();
+
+        _deleteModal.Close();
+    }
+
+    private async Task DeleteAll()
+    {
+        _spellingsController.RemoveAll();
+        await _spellingsController.StoreData();
+        await Update();
+
+        _deleteAllModal.Close();
+    }
+}
